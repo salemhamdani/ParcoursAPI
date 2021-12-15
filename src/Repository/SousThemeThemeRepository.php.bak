@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Repository;
+
+/**
+ * SousThemeThemeRepository
+ */
+class SousThemeThemeRepository extends \Doctrine\ORM\EntityRepository
+{
+}

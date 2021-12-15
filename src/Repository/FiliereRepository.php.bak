@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Repository;
+
+/**
+ * FiliereRepository
+ */
+class FiliereRepository extends \Doctrine\ORM\EntityRepository
+{
+}

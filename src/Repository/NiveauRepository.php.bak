@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Repository;
+
+/**
+ * NiveauRepository
+ */
+class NiveauRepository extends \Doctrine\ORM\EntityRepository
+{
+}
