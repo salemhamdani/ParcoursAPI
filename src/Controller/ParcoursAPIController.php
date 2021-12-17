@@ -12,20 +12,27 @@ use Symfony\Component\Routing\Annotation\Route;
 class ParcoursAPIController extends AbstractController
 {
     /**
-     * @Route("/parcoursAPI/{id}", name="parcours_api")
+     * @Route("/parcours/details/{id}", name="parcours_details")
      */
-    public function index(EntityManagerInterface $manager, $id,ParcoursAPIHelper $parcoursAPIHelper):Response
+    public function parcoursDetails(EntityManagerInterface $manager, $id,ParcoursAPIHelper $parcoursAPIHelper):Response
     {
             $parcours=$manager->getRepository(Parcours::class)->find($id);
-            $sessions=$parcours->getSessions();
             $response = new Response();
             $response->headers->set('Content-Type', 'application/json');
             $response->headers->set('Access-Control-Allow-Origin', '*');
-            $response->setContent($this->json($parcoursAPIHelper->ParcoursInfo($parcours)));
+            $response->setContent($this->json($parcoursAPIHelper->getParcoursInfo($parcours)));
             return $response;
-          /*  return $this->json([
-                'message' => ['Welcome to your new controller!','salem'],
-                'path' => ['salem'=>['test1'=>'val1'],['test2'=>'val2']],
-            ]);*/
+
+    }
+    /**
+     * @Route("/parcours/all", name="parcours_all")
+     */
+    public function allParcours(ParcoursAPIHelper $parcoursAPIHelper,EntityManagerInterface $manager):Response
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->setContent($this->json($parcoursAPIHelper->getAllParcours($manager)));
+        return $response;
     }
 }

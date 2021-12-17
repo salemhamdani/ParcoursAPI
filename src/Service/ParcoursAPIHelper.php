@@ -4,23 +4,31 @@ namespace App\Service;
 
 
 use App\Entity\Parcours;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ParcoursAPIHelper
 {
-    public function ParcoursInfo(Parcours $parcours)
+    public function generateCodesRomes(Parcours $parcours)
     {
-    $sessions =$parcours->getSessions();
-    $codesRomes=$parcours->getCodesromes();
-    $codesRomesArray=array();
-    foreach ($codesRomes as $codesrome)
-    {
-        array_push($codesRomesArray,$codesrome->getCode());
+        $codesRomes=$parcours->getCodesromes();
+        $codesRomesArray=array();
+        foreach ($codesRomes as $codesrome)
+        {
+            array_push($codesRomesArray,$codesrome->getCode());
+        }
+        return $codesRomesArray;
     }
-    $formatCodes=$parcours->getFormacodes();
-    $formatCodesArray=array();
+    public function generateFormatCodes(Parcours $parcours)
+    {
+        $formatCodes=$parcours->getFormacodes();
+        $formatCodesArray=array();
         foreach ($formatCodes as $formatCode) {
             array_push($formatCodesArray,$formatCode->getCode());
+        }
+        return $formatCodesArray;
     }
+    public function getParcoursInfo(Parcours $parcours)
+    {
     $blocs=$parcours->getBlocs();
     $blocsArray=array();
     foreach ($blocs as $bloc)
@@ -37,7 +45,6 @@ class ParcoursAPIHelper
             'modules'=>$modulesArray,
       ]);
     }
-    //array_push($blocsArray,['key'=>'value']);
     $body=[
         'BLOC_PRINCIPAL'=>
             [
@@ -65,8 +72,8 @@ class ParcoursAPIHelper
         'BAS_DE_PAGE'=>
         [
             'SanctionsDetaillees'=>$parcours->getSanctionlong(),
-            'Formacodes'=>$formatCodesArray,
-            'CodesROME'=>$codesRomesArray,
+            'Formacodes'=>$this->generateFormatCodes($parcours),
+            'CodesROME'=>$this->generateCodesRomes($parcours),
             'CodeNSF'=>$parcours->getCodensf(),
             'CodeRNCP'=>$parcours->getCoderncp(),
         ]
@@ -75,8 +82,36 @@ class ParcoursAPIHelper
 
     ];
     return $body;
-
-
     }
-
+     public function getAllParcours(EntityManagerInterface $manager)
+    {
+        $allparcours=$manager->getRepository(Parcours::class)->findAll();
+        $parcoursAllArray=array();
+        foreach ($allparcours as $parcours)
+        {
+            array_push($parcoursAllArray, [
+                'BLOC_PRINCIPAL'=>
+                    [
+                        'Intitule'=>$parcours->getIntitule(),
+                        'LeMetier'=>$parcours->getMetier(),
+                        'Objectifs'=>$parcours->getObjectif(),
+                        'LesPlus'=>$parcours->getPlus(),
+                        'Prerequis'=>$parcours->getPrerequis(),
+                        'ConditionsDAdmission'=>$parcours->getConditionadmission(),
+                    ],
+                'BAS_DE_PAGE'=>
+                    [
+                        'SanctionsDetaillees'=>$parcours->getSanctionlong(),
+                        'Formacodes'=>$this->generateFormatCodes($parcours),
+                        'CodesROME'=>$this->generateCodesRomes($parcours),
+                        'CodeNSF'=>$parcours->getCodensf(),
+                        'CodeRNCP'=>$parcours->getCoderncp(),
+                    ]
+            ]);
+        }
+        $body=[
+            'allParcours'=>$parcoursAllArray
+        ];
+        return $body;
+    }
 }
