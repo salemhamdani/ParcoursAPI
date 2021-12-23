@@ -37,7 +37,26 @@ class User {
      * )
      */
     protected $groups;
+    /**
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     */
+    private $apiToken;
 
+    /**
+     * @return string
+     */
+    public function getApiToken()
+    {
+        return $this->apiToken;
+    }
+
+    /**
+     * @param string $apiToken
+     */
+    public function setApiToken(string $apiToken): void
+    {
+        $this->apiToken = $apiToken;
+    }
 
     /**
      * @var string

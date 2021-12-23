@@ -1,0 +1,20 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Gestiform API
+            description: This is an awesome API!
+            version: 4.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    description: 'Authorization: bearer {jwt}'
+                    bearerFormat: JWT
+                    in: header
+
+        security:
+            - Bearer: [ ]
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc

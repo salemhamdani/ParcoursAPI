@@ -6,33 +6,58 @@ use App\Entity\Parcours;
 use App\Service\ParcoursAPIHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 class ParcoursAPIController extends AbstractController
 {
     /**
-     * @Route("/parcours/details/{id}", name="parcours_details")
+     *@OA\Tag(name="parcours")
+     *
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns the details of a parcours",
+     * )
+     * @OA\Response(
+     *     response="400",
+     *       description="BAD REQUEST",
+     * )
+     * @OA\Response(
+     *   response="401",
+     *       description="Unauthorized"
+     * )
+     *
+     * @Security(name="Bearer")
+     * @Route("api/parcours/details/{id}",methods={"GET","POST"}, name="parcours_details")
+     *
+     *@return JsonResponse
      */
+
     public function parcoursDetails(EntityManagerInterface $manager, $id,ParcoursAPIHelper $parcoursAPIHelper):Response
     {
             $parcours=$manager->getRepository(Parcours::class)->find($id);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/json');
-            $response->headers->set('Access-Control-Allow-Origin', '*');
-            $response->setContent($this->json($parcoursAPIHelper->getParcoursInfo($parcours)));
-            return $response;
+            if (!is_null($parcours))
+            {
+                return new JsonResponse($parcoursAPIHelper->getParcoursInfo($parcours));
+            }
+            else
+            {
+                return new JsonResponse("parcours of id given not found ");
+            }
+
 
     }
+
+
     /**
      * @Route("/parcours/all", name="parcours_all")
      */
     public function allParcours(ParcoursAPIHelper $parcoursAPIHelper,EntityManagerInterface $manager):Response
     {
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/json');
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        $response->setContent($this->json($parcoursAPIHelper->getAllParcours($manager)));
-        return $response;
+        return new JsonResponse($parcoursAPIHelper->getAllParcours($manager));
     }
 }

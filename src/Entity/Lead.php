@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\LeadRepository;
 use Doctrine\ORM\Mapping as ORM;
+use NoyauBundle\Entity\Aide;
 
 /**
  * @ORM\Entity(repositoryClass=LeadRepository::class)
