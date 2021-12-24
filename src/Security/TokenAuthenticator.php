@@ -2,6 +2,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,11 +15,11 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class TokenAuthenticator extends AbstractGuardAuthenticator
 {
-    private $em;
+    private $userRepository;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->em = $em;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -28,7 +29,15 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function supports(Request $request): bool
     {
-        return $request->headers->has('Authorization');
+
+        // look for header "Authorization: token <token>"
+        if ($request->headers->has('Authorization')
+            && 0 === strpos($request->headers->get('Authorization'), 'token ')
+        ) {
+            return true;
+        } else {
+            return new JsonResponse('', Response::HTTP_UNAUTHORIZED);
+        }
     }
 
     /**
@@ -38,7 +47,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     public function getCredentials(Request $request)
     {
         $authorizationHeader = $request->headers->get('Authorization');
-        // skip beyond "token "
+        // skip beyond ""bearer "
         return substr($authorizationHeader, 7);
         //return $authorizationHeader;
     }
@@ -54,7 +63,9 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         // The "username" in this case is the apiToken, see the key `property`
         // of `your_db_provider` in `security.yaml`.
         // If this returns a user, checkCredentials() is called next:
-        return $userProvider->loadUserByUsername($credentials);
+        return $this->userRepository->findOneBy([
+            'apiToken' => $credentials,
+        ]);
     }
 
     public function checkCredentials($credentials, UserInterface $user): bool
@@ -62,13 +73,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         // Check credentials - e.g. make sure the password is valid.
         // In case of an API token, no credential check is needed.
         // Return `true` to cause authentication success
-        //default token = "Bearer 123"
-        if ($credentials==="Bearer 123")
-        {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response

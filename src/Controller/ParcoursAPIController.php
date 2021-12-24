@@ -32,7 +32,7 @@ class ParcoursAPIController extends AbstractController
      * )
      *
      * @Security(name="Bearer")
-     * @Route("api/parcours/details/{id}",methods={"GET","POST"}, name="parcours_details")
+     * @Route("api/parcours/details/{id}",methods={"GET"}, name="parcours_details")
      *
      *@return JsonResponse
      */
@@ -51,10 +51,32 @@ class ParcoursAPIController extends AbstractController
 
 
     }
-
-
     /**
-     * @Route("/parcours/all", name="parcours_all")
+     *@OA\Tag(name="parcours")
+     *
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns parcours :
+    ALT = Formation en alternance,
+    INIT =Formation initiale,
+    CONT = Formation continue ,
+    CONV =Formation conventionnée,
+    ALL = Returns all parcours ",
+     * )
+     * @OA\Response(
+     *     response="400",
+     *       description="BAD REQUEST",
+     * )
+     * @OA\Response(
+     *   response="401",
+     *       description="Unauthorized"
+     * )
+     *
+     * @Security(name="Bearer")
+     * @Route("api/parcours/{code}",methods={"GET"}, name="parcours_all")
+     *
+     *@return JsonResponse
      */
     public function allParcours(ParcoursAPIHelper $parcoursAPIHelper,EntityManagerInterface $manager):Response
     {

@@ -41,7 +41,7 @@ class Lead
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $date_reunion;
+    private $datereunion;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -116,14 +116,14 @@ class Lead
         return $this;
     }
 
-    public function getDate_reunion(): ?\DateTimeInterface
+    public function getDatereunion(): ?\DateTimeInterface
     {
-        return $this->date_reunion;
+        return $this->datereunion;
     }
 
-    public function setDate_reunion(?\DateTimeInterface $date_reunion): self
+    public function setDatereunion(?\DateTimeInterface $datereunion): self
     {
-        $this->date_reunion = $date_reunion;
+        $this->datereunion = $datereunion;
 
         return $this;
     }

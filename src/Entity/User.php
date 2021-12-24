@@ -2,126 +2,321 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-/**
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ORM\Table(name="fos_user")
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({
-	"formateur" = "App\Entity\Formateur",
-	"employe" = "App\Entity\Employe",
-	"personne" = "App\Entity\Personne",
-	"user" = "App\Entity\User"})
- * 
- */
-class User {
 
+/**
+ * Users
+ *
+ * @ORM\Table(name="users")
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @UniqueEntity("email")
+ */
+class User implements UserInterface
+{
     /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Group", inversedBy="users")
-     * @ORM\JoinTable(name="fos_user_user_group",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="cascade")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="cascade")}
-     * )
+     * @var string|null
+     *
+     * @ORM\Column(name="email", type="string", length=255, nullable=false)
+     * @Assert\Email
      */
-    protected $groups;
+    private $email;
+
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
+     * @var string|null
+     *
+     * @ORM\Column(name="password", type="string", length=500, nullable=true)
+     */
+    private $password;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $apiToken;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="first_name", type="string", length=50, nullable=true)
+     */
+    private $firstName;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="last_name", type="string", length=50, nullable=true)
+     */
+    private $lastName;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="phone", type="string", length=20, nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="status", type="string", length=20, nullable=true)
+     */
+    private $status;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    private $roles = [];
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    protected $resetToken;
+
+    public function __construct()
+    {
+        // By doing that, the apiToken is not encrypted in the database.
+        // You should consider using the PasswordEncoder to encode/verify the apiToken
+        $this->apiToken = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string|null $email
+     * @return User
+     */
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param string|null $password
+     * @return slef
+     */
+    public function setPassword(?string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @param string|null $firstName
+     * @return User
+     */
+    public function setFirstName(?string $firstName): self
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @param string|null $lastName
+     * @return User
+     */
+    public function setLastName(?string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @param string|null $phone
+     * @return User
+     */
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string|null $status
+     * @return User
+     */
+    public function setStatus(?string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFax(): ?string
+    {
+        return $this->fax;
+    }
+
+    /**
+     * @param string|null $fax
+     * @return User
+     */
+    public function setFax(?string $fax): self
+    {
+        $this->fax = $fax;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = json_decode($this->roles, true);
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = json_encode($roles);
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSalt()
+    {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUsername()
+    {
+        return (string)$this->email;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function eraseCredentials()
+    {
+        return null;
+    }
+
+    /**
      * @return string
      */
-    public function getApiToken()
+    public function getApiToken(): string
     {
         return $this->apiToken;
     }
 
     /**
-     * @param string $apiToken
-     */
-    public function setApiToken(string $apiToken): void
-    {
-        $this->apiToken = $apiToken;
-    }
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="access_space", type="string", length=200, nullable=true)
-     */
-    private $accessSpace;
-
-    //pour EasyAdmin
-    public function getExpiresAt() {
-        return $this->expiresAt;
-    }
-
-    public function getCredentialsExpireAt() {
-        return $this->credentialsExpireAt;
-    }
-
-    public function __construct() {
-        parent::__construct();
-        // your own logic
-    }
-
-    /**
-     * Set accessSpace
-     *
-     * @param string $accessSpace
-     *
      * @return User
+     * @throws \Exception
      */
-    public function setAccessSpace($accessSpace) {
-        $this->accessSpace = $accessSpace;
+    public function setApiToken(): self
+    {
+        $this->apiToken = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
 
         return $this;
     }
 
     /**
-     * Get accessSpace
-     *
      * @return string
      */
-    public function getAccessSpace() {
-        return $this->accessSpace;
+    public function getResetToken(): string
+    {
+        return $this->resetToken;
     }
 
-       /**
-     * Set type
-     *
-     * @param string $type
-     *
-     * @return User
+    /**
+     * @param string $resetToken
      */
-    public function setType($type)
+    public function setResetToken(): self
     {
-        $this->type = $type;
+        $this->resetToken = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
 
         return $this;
     }
 
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getType()
+    public function removeResetToken(): self
     {
-        return $this->type;
+        $this->resetToken = null;
+
+        return $this;
     }
 }
