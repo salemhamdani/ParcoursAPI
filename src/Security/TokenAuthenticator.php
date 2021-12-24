@@ -36,7 +36,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         ) {
             return true;
         } else {
-            return new JsonResponse('', Response::HTTP_UNAUTHORIZED);
+            return false;
         }
     }
 

@@ -57,12 +57,12 @@ class ParcoursAPIController extends AbstractController
      *
      * @OA\Response(
      *     response=200,
-     *     description="Returns parcours :
-    ALT = Formation en alternance,
-    INIT =Formation initiale,
-    CONT = Formation continue ,
-    CONV =Formation conventionnée,
-    ALL = Returns all parcours ",
+     *     description="Returns parcours by given code:<br/>
+    ALT = Formation en alternance.<br/>
+    INIT =Formation initiale.<br/>
+    CONT = Formation continue.<br/>
+    CONV =Formation conventionnée.<br/>
+    ALL = Returns all parcours. ",
      * )
      * @OA\Response(
      *     response="400",
@@ -78,8 +78,8 @@ class ParcoursAPIController extends AbstractController
      *
      *@return JsonResponse
      */
-    public function allParcours(ParcoursAPIHelper $parcoursAPIHelper,EntityManagerInterface $manager):Response
+    public function allParcours(ParcoursAPIHelper $parcoursAPIHelper,$code,EntityManagerInterface $manager):Response
     {
-        return new JsonResponse($parcoursAPIHelper->getAllParcours($manager));
+        return new JsonResponse($parcoursAPIHelper->getAllParcours($manager,$code));
     }
 }

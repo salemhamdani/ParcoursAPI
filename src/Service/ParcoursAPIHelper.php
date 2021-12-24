@@ -3,6 +3,7 @@
 namespace App\Service;
 
 
+use App\Entity\Masterlistelg;
 use App\Entity\Parcours;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -83,15 +84,29 @@ class ParcoursAPIHelper
     ];
     return $body;
     }
-     public function getAllParcours(EntityManagerInterface $manager)
+     public function getAllParcours(EntityManagerInterface $manager,$code)
     {
-        $allparcours=$manager->getRepository(Parcours::class)->findAll();
+        $typeformation=$manager->getRepository(Masterlistelg::class)->getOneByListeCode('FORMATIONS','TYPEFORMATION',$code);
+        $allparcours=array();
+        if(! is_null($typeformation))
+        {
+            $allparcours=$manager->getRepository(Parcours::class)->findByTypeformation($typeformation);
+        }
+        else
+        {
+            if($code=='ALL')
+            {
+                $allparcours=$manager->getRepository(Parcours::class)->findAll();
+            }
+
+        }
         $parcoursAllArray=array();
         foreach ($allparcours as $parcours)
         {
             array_push($parcoursAllArray, [
                 'BLOC_PRINCIPAL'=>
                     [
+                        'Id'=>$parcours->getId(),
                         'Intitule'=>$parcours->getIntitule(),
                         'LeMetier'=>$parcours->getMetier(),
                         'Objectifs'=>$parcours->getObjectif(),
